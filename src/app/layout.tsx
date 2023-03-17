@@ -1,4 +1,6 @@
+import Navbar from '@/components/navbar';
 import './globals.css';
+import { ClerkProvider } from '@clerk/nextjs/app-beta';
 
 export const metadata = {
   title: 'Create Next App',
@@ -12,9 +14,12 @@ export type LayoutProps = {
 export default function RootLayout({ children }: LayoutProps) {
   return (
     <html lang="en">
-      <body>
-        {children}
-      </body>
+      <ClerkProvider>
+        <body>
+          <Navbar />
+          {children}
+        </body>
+      </ClerkProvider>
     </html>
   );
 }
