@@ -1,10 +1,22 @@
 'use client';
 
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import DiscountInput from "./discount-input";
 import TypeToggle, { Type } from "./type-toggle";
 import TextInput from "./text-input";
 import StartAndEndDateInputs from "./start-and-end-date-inputs";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
+import { NewPromcodeSchema, NewPromcodeSchemaType } from "@/lib/zod";
+
+async function postPromocode(body: NewPromcodeSchemaType) {
+  const res = await fetch(`/api/promocode`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+
+  return res.json();
+}
 
 export default function Form() {
   const [code, setCode] = useState<string>('');
@@ -14,10 +26,36 @@ export default function Form() {
   const [maxDiscount, setMaxDiscount] = useState<number>(Infinity);
   const [start, setStart] = useState<string>('');
   const [end, setEnd] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const router = useRouter();
+  const auth = useAuth();
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const formData = {
+      userId: auth.userId,
+      code,
+      type,
+      discount: type === 'amount' ? amountDiscount : percentDiscount,
+      maxDiscount: maxDiscount === Infinity ? null : maxDiscount,
+      start: new Date(start),
+      end: new Date(end),
+    };
+
+    const parsedFormData = NewPromcodeSchema.parse(formData);
+    const data = await postPromocode(parsedFormData);
+
+    console.log(data);
+
+    setIsSubmitting(false);
+    router.push('/promocodes');
+  }
 
   return (
     <section className="rounded p-6 bg-neutral-100 w-full max-w-lg border border-neutral-200">
-      <form className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <TextInput
           name="code"
           value={code}
@@ -43,11 +81,13 @@ export default function Form() {
           setEnd={setEnd}
         />
         <FormSectionWrapper>
-          <input
+          <button
             type="submit"
-            value={'CREATE'}
-            className="w-full py-3 rounded-md shadow bg-neutral-300 text-neutral-700 font-semibold"
-          />
+            className="w-full py-3 cursor-pointer disabled:cursor-not-allowed rounded-md shadow hover:shadow-lg bg-neutral-300 hover:bg-neutral-400 text-neutral-700 hover:text-neutral-800 font-semibold transition-all duration-100 ease-in-out"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'CREATING...' : 'CREATE'}
+          </button>
         </FormSectionWrapper>
       </form>
     </section>

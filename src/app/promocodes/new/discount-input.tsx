@@ -37,6 +37,7 @@ function DiscountInput(props: DiscountInputProps) {
             onChange={handleDiscountChange}
             id="discount"
             className="w-full outline-none font-mono rounded-md p-3 pl-16 bg-white border border-neutral-200"
+            required
           />
         </div>
       </FormSectionWrapper>

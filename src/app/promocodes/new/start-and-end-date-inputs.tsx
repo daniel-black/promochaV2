@@ -18,6 +18,7 @@ function StartAndEndDateInputs(props: StartAndEndDateInputsProps) {
           value={props.start}
           onChange={e => props.setStart(e.target.value)}
           className="w-full rounded-md p-3 bg-white border border-neutral-200 outline-none"
+          required
         />
       </FormSectionWrapper>
       <FormSectionWrapper>
@@ -28,6 +29,7 @@ function StartAndEndDateInputs(props: StartAndEndDateInputsProps) {
           min={props.start}
           onChange={e => props.setEnd(e.target.value)}
           className="w-full rounded-md p-3 bg-white border border-neutral-200 outline-none"
+          required
         />
       </FormSectionWrapper>
     </div>

@@ -17,6 +17,7 @@ function TextInput({ name, value, onChange }: TextInputProps) {
         type="text"
         id={name}
         className="uppercase font-mono w-full rounded-md p-3 bg-white border border-neutral-200"
+        required
       />
     </FormSectionWrapper>
   );

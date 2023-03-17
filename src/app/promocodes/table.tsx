@@ -42,8 +42,8 @@ function TableBody({ promocodes }: TableProps) {
           <div key={p.code} className="flex justify-between items-center py-3">
             <div className="text-center w-1/4">{p.code}</div>
             <div className="text-center w-1/4">{p.discount}</div>
-            <div className="text-center w-1/4">{p.start.toDateString()}</div>
-            <div className="text-center w-1/4">{p.end.toDateString()}</div>
+            <div className="text-center w-1/4">{new Date(p.start).toDateString()}</div>
+            <div className="text-center w-1/4">{new Date(p.end).toDateString()}</div>
           </div>  
         )
       ) : (
