@@ -10,7 +10,7 @@ async function PromocodesPage() {
   });
 
   return (
-    <div className="py-10">
+    <div className="py-10 px-2 sm:px-4 md:px-8 lg:px-16">
       <Table promocodes={promocodes} />
     </div>
   );
