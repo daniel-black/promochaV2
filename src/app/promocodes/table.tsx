@@ -57,7 +57,7 @@ function TableHeader({ sortBy, reverse, setSortBy, setReverse }: TableHeaderProp
           }
         }}
       >
-        <GiftIcon className="w-5 h-5" />
+        <GiftIcon className="w-0 h-0 sm:w-5 sm:h-5" />
         <span className="ml-2 mr-1">Code</span>
         <ChevronUpDownIcon className={`w-5 h-5 ${sortBy === 'code' ? 'text-neutral-600' : 'text-neutral-400 group-hover:text-neutral-600'} transition-all duration-75`} />
       </button>
@@ -72,7 +72,7 @@ function TableHeader({ sortBy, reverse, setSortBy, setReverse }: TableHeaderProp
           }
         }}
       >
-        <TagIcon className="w-5 h-5" />
+        <TagIcon className="w-0 h-0 sm:w-5 sm:h-5" />
         <span className="ml-2 mr-1">Discount</span>
         <ChevronUpDownIcon className={`w-5 h-5 ${sortBy === 'discount' ? 'text-neutral-600' : 'text-neutral-400 group-hover:text-neutral-600'} transition-all duration-75`} />
       </button>
@@ -87,7 +87,7 @@ function TableHeader({ sortBy, reverse, setSortBy, setReverse }: TableHeaderProp
           }
         }}
       >
-        <CalendarIcon className="w-5 h-5" />
+        <CalendarIcon className="w-0 h-0 sm:w-5 sm:h-5" />
         <span className="ml-2 mr-1">Start</span>
         <ChevronUpDownIcon className={`w-5 h-5 ${sortBy === 'start' ? 'text-neutral-600' : 'text-neutral-400 group-hover:text-neutral-600'} transition-all duration-75`} />
       </button>
@@ -102,7 +102,7 @@ function TableHeader({ sortBy, reverse, setSortBy, setReverse }: TableHeaderProp
           }
         }}
       >
-        <CalendarIcon className="w-5 h-5" />
+        <CalendarIcon className="w-0 h-0 sm:w-5 sm:h-5" />
         <span className="ml-2 mr-1">End</span>
         <ChevronUpDownIcon className={`w-5 h-5 ${sortBy === 'end' ? 'text-neutral-600' : 'text-neutral-400 group-hover:text-neutral-600'} transition-all duration-75`} />
       </button>
@@ -169,7 +169,7 @@ function TableBody({ promocodes, sortBy, reverse }: TableBodyProps) {
       {promocodes && promocodes.length > 0 ? (
         sortedPromocodes.map(p =>
           <div key={p.code} className="flex justify-between items-center py-3 border-l-4 border-transparent hover:shadow-sm hover:border-neutral-300 hover:bg-neutral-50 group transition-all duration-75">
-            <PromocodeLink code={p.code} />
+            <PromocodeLink code={p.code} start={p.start} end={p.end} />
             <DiscountCell discount={p.discount} type={p.type as Type} />
             <DateCell date={p.start} />
             <DateCell date={p.end} />
@@ -184,14 +184,24 @@ function TableBody({ promocodes, sortBy, reverse }: TableBodyProps) {
   );
 }
 
+function isPromocodeActive(start: Date | string, end: Date | string) {
+  const now = new Date();
+  return new Date(start) < now && now < new Date(end);
+}
+
 type PromocodeLinkProps = {
   code: string;
+  start: Date | string;
+  end: Date | string;
 };
 
-function PromocodeLink({ code }: PromocodeLinkProps) {
+function PromocodeLink({ code, start, end }: PromocodeLinkProps) {
+  const isActive = isPromocodeActive(start, end);
+
   return (
-    <div className="text-center w-1/4">
-      <Link href={`/promocodes/${code}`} className="block w-full h-full font-mono group-hover:underline text-neutral-800">
+    <div className="w-1/4 flex justify-center items-center">
+      <span className={`w-2.5 h-2.5 shadow ring-1 rounded-full mr-3 ${isActive ? 'bg-green-300 ring-emerald-400' : 'bg-neutral-300 ring-neutral-400'}`}></span>
+      <Link href={`/promocodes/${code}`} className="h-full pl-2 w-40 font-mono group-hover:underline text-neutral-800 text-ellipsis">
         {code}
       </Link>
     </div>
