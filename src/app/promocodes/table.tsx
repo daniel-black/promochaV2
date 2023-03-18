@@ -4,53 +4,163 @@ import type { Promocode } from "@prisma/client";
 import TableFooter from "./table-footer";
 import Link from "next/link";
 import { Type } from "./new/type-toggle";
+import { Dispatch, SetStateAction, useState } from "react";
 
 type TableProps = {
   promocodes: Promocode[];
 };
 
-export default function Table(props: TableProps) {
+const columnNames = ['code', 'discount', 'start', 'end'] as const;
+type Column = typeof columnNames[number];
+
+export default function Table({ promocodes }: TableProps) {
+  const [sortBy, setSortBy] = useState<Column>();
+  const [reverse, setReverse] = useState<boolean>(false);
+
+  console.log({reverse});
+
   return (
     <main className="w-full">
-      <TableHeader />
-      <TableBody {...props} />
+      <TableHeader
+        sortBy={sortBy}
+        reverse={reverse}
+        setSortBy={setSortBy}
+        setReverse={setReverse}
+      />
+      <TableBody
+        promocodes={promocodes}
+        sortBy={sortBy}
+        reverse={reverse}
+      />
       <TableFooter />
     </main>
   );
 }
 
-function TableHeader() {
+type TableHeaderProps = {
+  sortBy: Column | undefined;
+  reverse: boolean;
+  setSortBy: Dispatch<SetStateAction<Column | undefined>>
+  setReverse: Dispatch<SetStateAction<boolean>>;
+};
+
+function TableHeader({ sortBy, reverse, setSortBy, setReverse }: TableHeaderProps) {
   return (
     <header className="flex justify-between items-center py-3 rounded-t-md bg-neutral-200 border border-neutral-300">
       <button
         className="text-center w-1/4 text-neutral-600"
+        onClick={e => {
+          e.preventDefault();
+          if (sortBy === 'code') {
+            setReverse(!reverse);
+          } else {
+            setSortBy('code');
+          }
+        }}
       >
-        Code
+        Code {sortBy === 'code' ? '·' : ''}
       </button>
       <button
         className="text-center w-1/4 text-neutral-600"
+        onClick={e => {
+          e.preventDefault();
+          if (sortBy === 'discount') {
+            setReverse(!reverse);
+          } else {
+            setSortBy('discount');
+          }
+        }}
       >
-        Discount
+        Discount {sortBy === 'discount' ? '·' : ''}
       </button>
       <button
         className="text-center w-1/4 text-neutral-600"
+        onClick={e => {
+          e.preventDefault();
+          if (sortBy === 'start') {
+            setReverse(!reverse);
+          } else {
+            setSortBy('start');
+          }
+        }}
       >
-        Start
+        Start {sortBy === 'start' ? '·' : ''}
       </button>
       <button
         className="text-center w-1/4 text-neutral-600"
+        onClick={e => {
+          e.preventDefault();
+          if (sortBy === 'end') {
+            setReverse(!reverse);
+          } else {
+            setSortBy('end');
+          }
+        }}
       >
-        End
+        End {sortBy === 'end' ? '·' : ''}
       </button>
     </header>
   );
 }
 
-function TableBody({ promocodes }: TableProps) {
+function getSortedPromocodes(promocodes: Promocode[], sortBy: Column | undefined, reverse: boolean) {
+  let sorted = promocodes;
+
+  switch (sortBy) {
+    case 'code':
+      sorted = sortByCode(promocodes);
+      break;
+    case 'discount':
+      sorted = sortByDiscount(promocodes);
+      break;
+    case 'start':
+      sorted = sortByDate(promocodes, 'start');
+      break;
+    case 'end':
+      sorted = sortByDate(promocodes, 'end');
+      break;
+  }
+
+  return reverse ? sorted.reverse() : sorted;
+}
+
+function sortByCode(promocodes: Promocode[]) {
+  return promocodes.sort((a, b) => {
+    if (a.code < b.code) return -1;
+    if (a.code > b.code) return 1;
+    return 0;
+  });
+}
+
+function sortByDiscount(promocodes: Promocode[]) {
+  const amountSorted = promocodes.filter(p => p.type === 'amount').sort((a, b) => a.discount - b.discount);
+  const percentSorted = promocodes.filter(p => p.type === 'percent').sort((a, b) => a.discount - b.discount);
+  return amountSorted.concat(percentSorted);
+}
+
+function sortByDate(promocodes: Promocode[], sortBy: 'start' | 'end') {
+  return promocodes.sort((a, b) => {
+    const aDate = new Date(a[sortBy]);
+    const bDate = new Date(b[sortBy]);
+    if (aDate < bDate) return -1;
+    if (aDate > bDate) return 1;
+    return 0;
+  });
+}
+
+type TableBodyProps = {
+  promocodes: Promocode[];
+  sortBy: Column | undefined;
+  reverse: boolean;
+}
+
+function TableBody({ promocodes, sortBy, reverse }: TableBodyProps) {
+  const sortedPromocodes = getSortedPromocodes(promocodes, sortBy, reverse);
+
   return (
     <section className="bg-neutral-100 border-x border-neutral-300 max-h-[73vh] overflow-y-auto">
       {promocodes && promocodes.length > 0 ? (
-        promocodes.map(p =>
+        sortedPromocodes.map(p =>
           <div key={p.code} className="flex justify-between items-center py-3 hover:bg-neutral-50 group">
             <PromocodeLink code={p.code} />
             {/* <div className="text-center w-1/4">{p.discount}</div> */}
