@@ -6,7 +6,9 @@ import SignInUpButtons from "./sign-in-up-buttons";
 function Navbar() {
   return (
     <nav className="bg-neutral-50 text-neutral-600 shadow-sm px-3 py-2 flex justify-between items-center">
-      <Link href={'/'} className="font-semibold">ProMocha</Link>
+      <Link href={'/'} className="font-semibold flex items-center">
+        ProMocha
+      </Link>
       <div className="flex items-center space-x-5">
         <SignedIn>
           <Link href={'/promocodes'}>Promocodes</Link>
