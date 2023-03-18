@@ -5,6 +5,7 @@ import TableFooter from "./table-footer";
 import Link from "next/link";
 import { Type } from "./new/type-toggle";
 import { Dispatch, SetStateAction, useState } from "react";
+import { CalendarIcon, TagIcon, GiftIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline'
 
 type TableProps = {
   promocodes: Promocode[];
@@ -16,8 +17,6 @@ type Column = typeof columnNames[number];
 export default function Table({ promocodes }: TableProps) {
   const [sortBy, setSortBy] = useState<Column>();
   const [reverse, setReverse] = useState<boolean>(false);
-
-  console.log({reverse});
 
   return (
     <main className="w-full">
@@ -48,7 +47,7 @@ function TableHeader({ sortBy, reverse, setSortBy, setReverse }: TableHeaderProp
   return (
     <header className="flex justify-between items-center py-3 rounded-t-md bg-neutral-200 border border-neutral-300">
       <button
-        className="text-center w-1/4 text-neutral-600"
+        className="w-1/4 text-neutral-600 flex justify-center items-center group"
         onClick={e => {
           e.preventDefault();
           if (sortBy === 'code') {
@@ -58,10 +57,12 @@ function TableHeader({ sortBy, reverse, setSortBy, setReverse }: TableHeaderProp
           }
         }}
       >
-        Code {sortBy === 'code' ? '·' : ''}
+        <GiftIcon className="w-5 h-5" />
+        <span className="ml-2 mr-1">Code</span>
+        <ChevronUpDownIcon className={`w-5 h-5 ${sortBy === 'code' ? 'text-neutral-600' : 'text-neutral-400 group-hover:text-neutral-600'} transition-all duration-75`} />
       </button>
       <button
-        className="text-center w-1/4 text-neutral-600"
+        className="w-1/4 text-neutral-600 flex justify-center items-center group"
         onClick={e => {
           e.preventDefault();
           if (sortBy === 'discount') {
@@ -71,10 +72,12 @@ function TableHeader({ sortBy, reverse, setSortBy, setReverse }: TableHeaderProp
           }
         }}
       >
-        Discount {sortBy === 'discount' ? '·' : ''}
+        <TagIcon className="w-5 h-5" />
+        <span className="ml-2 mr-1">Discount</span>
+        <ChevronUpDownIcon className={`w-5 h-5 ${sortBy === 'discount' ? 'text-neutral-600' : 'text-neutral-400 group-hover:text-neutral-600'} transition-all duration-75`} />
       </button>
       <button
-        className="text-center w-1/4 text-neutral-600"
+        className="w-1/4 text-neutral-600 flex items-center justify-center group"
         onClick={e => {
           e.preventDefault();
           if (sortBy === 'start') {
@@ -84,10 +87,12 @@ function TableHeader({ sortBy, reverse, setSortBy, setReverse }: TableHeaderProp
           }
         }}
       >
-        Start {sortBy === 'start' ? '·' : ''}
+        <CalendarIcon className="w-5 h-5" />
+        <span className="ml-2 mr-1">Start</span>
+        <ChevronUpDownIcon className={`w-5 h-5 ${sortBy === 'start' ? 'text-neutral-600' : 'text-neutral-400 group-hover:text-neutral-600'} transition-all duration-75`} />
       </button>
       <button
-        className="text-center w-1/4 text-neutral-600"
+        className="w-1/4 text-neutral-600 flex justify-center items-center group"
         onClick={e => {
           e.preventDefault();
           if (sortBy === 'end') {
@@ -97,7 +102,9 @@ function TableHeader({ sortBy, reverse, setSortBy, setReverse }: TableHeaderProp
           }
         }}
       >
-        End {sortBy === 'end' ? '·' : ''}
+        <CalendarIcon className="w-5 h-5" />
+        <span className="ml-2 mr-1">End</span>
+        <ChevronUpDownIcon className={`w-5 h-5 ${sortBy === 'end' ? 'text-neutral-600' : 'text-neutral-400 group-hover:text-neutral-600'} transition-all duration-75`} />
       </button>
     </header>
   );
@@ -161,9 +168,8 @@ function TableBody({ promocodes, sortBy, reverse }: TableBodyProps) {
     <section className="bg-neutral-100 border-x border-neutral-300 max-h-[73vh] overflow-y-auto">
       {promocodes && promocodes.length > 0 ? (
         sortedPromocodes.map(p =>
-          <div key={p.code} className="flex justify-between items-center py-3 hover:bg-neutral-50 group">
+          <div key={p.code} className="flex justify-between items-center py-3 border-l-4 border-transparent hover:shadow-sm hover:border-neutral-300 hover:bg-neutral-50 group transition-all duration-75">
             <PromocodeLink code={p.code} />
-            {/* <div className="text-center w-1/4">{p.discount}</div> */}
             <DiscountCell discount={p.discount} type={p.type as Type} />
             <DateCell date={p.start} />
             <DateCell date={p.end} />
@@ -208,7 +214,7 @@ type DiscountCellProps = {
 function DiscountCell({ discount, type }: DiscountCellProps) {
   const [style, discountText] = type === 'amount'
     ? ['bg-green-200 text-green-700 border-green-300', currencyFormatter.format(discount)]
-    : ['bg-indigo-200 text-indigo-700 border-indigo-300', `${discount}%`];
+    : ['bg-indigo-100 text-indigo-600 border-indigo-200', `${discount}%`];
 
   return (
     <div className="text-center w-1/4 flex justify-center items-center">
