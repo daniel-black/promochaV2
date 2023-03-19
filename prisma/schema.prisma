@@ -21,4 +21,14 @@ model Promocode {
   maxDiscount Float?
   start       String
   end         String
+  applies     Apply[]
+}
+
+model Apply {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  promocode   Promocode @relation(fields: [codeId], references: [id])
+  codeId      Int
+  code        String
+  savings     Float
 }

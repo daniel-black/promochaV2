@@ -11,6 +11,20 @@ export async function POST(req: NextRequest) {
     const data = NewPromcodeSchema.parse({
       ...body,
     });
+
+    const codeAlreadyExists = await prisma.promocode.count({
+      where: {
+        userId: data.userId,
+        code: data.code,
+      }
+    }) > 0;
+
+    if (codeAlreadyExists) {
+      return new Response(null, {
+        status: 400,
+        statusText: 'Code already exists for user'
+      });
+    }
   
     const promocode = await prisma.promocode.create({ data });
 

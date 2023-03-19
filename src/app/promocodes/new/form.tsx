@@ -83,7 +83,7 @@ export default function Form() {
         <FormSectionWrapper>
           <button
             type="submit"
-            className="w-full py-3 cursor-pointer disabled:cursor-not-allowed rounded-md shadow hover:shadow-lg bg-neutral-300 hover:bg-neutral-400 text-neutral-700 hover:text-neutral-800 font-semibold transition-all duration-100 ease-in-out"
+            className="w-full py-3 cursor-pointer disabled:cursor-not-allowed rounded-md shadow hover:shadow-lg border border-violet-400 hover:border-violet-500 bg-violet-300 text-violet-800 hover:bg-violet-500 hover:text-violet-900 font-semibold transition-all duration-100 ease-in-out"
             disabled={isSubmitting}
           >
             {isSubmitting ? 'CREATING...' : 'CREATE'}

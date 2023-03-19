@@ -169,7 +169,7 @@ function TableBody({ promocodes, sortBy, reverse }: TableBodyProps) {
       {promocodes && promocodes.length > 0 ? (
         sortedPromocodes.map(p =>
           <div key={p.code} className="flex justify-between items-center py-3 border-l-4 border-transparent hover:shadow-sm hover:border-neutral-300 hover:bg-neutral-50 group transition-all duration-75">
-            <PromocodeLink code={p.code} start={p.start} end={p.end} />
+            <PromocodeLink code={p.code} />
             <DiscountCell discount={p.discount} type={p.type as Type} />
             <DateCell date={p.start} />
             <DateCell date={p.end} />
@@ -194,17 +194,12 @@ function isPromocodeActive(start: Date | string, end: Date | string) {
 
 type PromocodeLinkProps = {
   code: string;
-  start: Date | string;
-  end: Date | string;
 };
 
-function PromocodeLink({ code, start, end }: PromocodeLinkProps) {
-  const isActive = isPromocodeActive(start, end);
-
+function PromocodeLink({ code }: PromocodeLinkProps) {
   return (
     <div className="w-1/4 flex justify-center items-center">
-      <span className={`w-2.5 h-2.5 shadow ring-1 rounded-full mr-3 ${isActive ? 'bg-green-300 ring-emerald-400' : 'bg-neutral-300 ring-neutral-400'}`}></span>
-      <Link href={`/promocodes/${code}`} className="h-full pl-2 w-40 font-mono group-hover:underline text-neutral-800 text-ellipsis">
+      <Link href={`/promocodes/${code}`} className="h-full pl-4 w-40 font-mono group-hover:underline text-neutral-800 text-ellipsis">
         {code}
       </Link>
     </div>
