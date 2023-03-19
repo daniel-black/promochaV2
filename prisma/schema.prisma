@@ -19,6 +19,6 @@ model Promocode {
   type        String
   discount    Float
   maxDiscount Float?
-  start       DateTime
-  end         DateTime
+  start       String
+  end         String
 }
