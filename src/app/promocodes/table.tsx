@@ -5,7 +5,7 @@ import TableFooter from "./table-footer";
 import Link from "next/link";
 import { Type } from "./new/type-toggle";
 import { Dispatch, SetStateAction, useState } from "react";
-import { CalendarIcon, TagIcon, GiftIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline'
+import { CalendarIcon, TagIcon, GiftIcon, ChevronUpDownIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline'
 
 type TableProps = {
   promocodes: Promocode[];
@@ -177,7 +177,10 @@ function TableBody({ promocodes, sortBy, reverse }: TableBodyProps) {
         )
       ) : (
         <div className=" py-10 flex justify-center">
-          <span className="px-4 py-2 text-xl bg-yellow-200 text-yellow-700 rounded-lg border border-yellow-400">No promocodes found!</span>
+          <div className="px-4 py-2 flex items-center space-x-2 text-xl bg-yellow-100 text-yellow-700 rounded-lg border border-yellow-400">
+            <ExclamationCircleIcon className="h-6 w-6" />
+            <span>No promocodes found</span>
+          </div>
         </div>
       )}
     </section>

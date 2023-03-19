@@ -2,11 +2,10 @@
 
 import type { Promocode } from "@prisma/client";
 import { useCallback, useState } from "react";
-import { CalendarIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { CalendarIcon, InformationCircleIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { UpdatePromocodeSchemaType } from "@/lib/zod";
 import { useRouter } from "next/navigation";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/solid";
-import BackButton from "@/components/back-button";
 
 function formatDateString(dateString: string | Date) {
   return new Date(dateString).toISOString().slice(0, 10);
@@ -45,8 +44,9 @@ export default function EditablePromocode({ promocode }: { promocode: Promocode 
 
   const [updating, setUpdating] = useState<boolean>(false);
   const [deleting, setDeleting] = useState<boolean>(false);
-
   const [deleted, setDeleted] = useState<boolean>(false);
+
+  const disabled = updating || deleting || deleted;
 
   const [showOptions, setShowOptions] = useState<boolean>(false);
 
@@ -63,13 +63,13 @@ export default function EditablePromocode({ promocode }: { promocode: Promocode 
 
   const anyModified = codeModified || discountModified || maxDiscountModified || startModified || endModified;
 
+  // Click handlers
   function handleOptionsClick(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     setShowOptions(!showOptions);
   }
 
   const handleResetClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    console.log('declared')
     e.preventDefault();
     setCode(promocode.code);
     setDiscount(promocode.discount);
@@ -87,12 +87,10 @@ export default function EditablePromocode({ promocode }: { promocode: Promocode 
     
     setDeleting(false);
     setDeleted(true);
-
-    console.log('done deleting')
-    console.log(promocode)
   }
 
   async function handleUndoDeleteClick(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
     const res = await undoDelete(promocode);
     if (res.ok) {
       router.refresh();
@@ -123,18 +121,28 @@ export default function EditablePromocode({ promocode }: { promocode: Promocode 
     }
   }
 
+  // render after delete
   if (deleted) {
     return (
       <section className="w-full max-w-2xl rounded-lg border border-neutral-200 p-5 bg-neutral-100 space-y-5">
-        <h1 className="text-3xl">{promocode.code} has been deleted.</h1>
-        <button
-          className="px-3 py-1.5 rounded text-neutral-200 hover:text-neutral-50 bg-neutral-600 hover:bg-neutral-700 border-neutral-700 hover:border-neutral-800 border transition-all duration-100"
-          onClick={handleUndoDeleteClick}
-        >
-          Undo
-        </button>
+        <div className="flex justify-between items-start">
+          <h1 className="text-3xl">{promocode.code} has been deleted.</h1>
+          <button
+            className="px-3 py-1.5 rounded flex justify-center items-center space-x-2 text-neutral-200 hover:text-neutral-50 bg-neutral-600 hover:bg-neutral-700 border-neutral-700 hover:border-neutral-800 border transition-all duration-100"
+            onClick={handleUndoDeleteClick}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={`h-4 w-4 rotate-180`}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 15l6-6m0 0l-6-6m6 6H9a6 6 0 000 12h3" />
+            </svg>
+            <span>Undo</span>
+          </button>
+        </div>
+        <div className="flex justify-start items-center space-x-1 text-neutral-500">
+          <InformationCircleIcon className="h-4 w-4" />
+          <span className="text-sm">You will not be able to undo the delete if you refresh or leave this page</span>
+        </div>
       </section>
-    )
+    );
   }
 
   return (
@@ -152,20 +160,26 @@ export default function EditablePromocode({ promocode }: { promocode: Promocode 
           />
           {codeModified && <span className="absolute -top-3 -right-3"><ResetButton handleClick={() => setCode(promocode.code)} /></span>}
         </div>
-        <button className={`relative border hover:border-neutral-200 hover:bg-neutral-50 ${showOptions ? 'bg-neutral-50 border-neutral-200' : 'border-transparent'} rounded-lg w-[60px] h-[60px] text-4xl flex justify-center items-center transition-all duration-100`} onClick={handleOptionsClick} disabled={updating}>
-          <EllipsisVerticalIcon className="h-8 w-8" />
-          <div className={`absolute ${showOptions ? 'opacity-100 z-20 -bottom-[16px]' : 'opacity-0 -z-10 bottom-2'} pointer-events-none h-3 w-3 rotate-45 bg-neutral-50 border-l border-t border-neutral-200 rounded-tl-sm transition-all duration-200 ease-in-out`} />
-          <div className={`absolute cursor-pointer pointer-events-none text-base bg-neutral-50 py-3 px-5 rounded border ${showOptions ? 'opacity-100 z-10 -bottom-16 shadow-lg' : 'opacity-0 -z-10 -bottom-10 shadow-sm'} transition-all duration-200 ease-in-out`}>
+        <div className="relative">
+          <button
+            className={`border hover:border-neutral-200 hover:bg-neutral-50 ${showOptions ? 'bg-neutral-50 border-neutral-200' : 'border-transparent'} rounded-lg w-[60px] h-[60px] text-4xl flex justify-center items-center transition-all duration-100`}
+            onClick={handleOptionsClick}
+            disabled={disabled}
+          >
+            <EllipsisVerticalIcon className="h-8 w-8" />
+            <div className={`absolute ${showOptions ? 'opacity-100 z-20 -bottom-[16px]' : 'opacity-0 -z-10 bottom-2'} pointer-events-none h-3 w-3 rotate-45 bg-neutral-50 border-l border-t border-neutral-200 rounded-tl-sm transition-all duration-200 ease-in-out`} />
+          </button>
+          <div className={`absolute -left-12 cursor-pointer pointer-events-none text-base bg-neutral-50 p-3 rounded border ${showOptions ? 'opacity-100 z-10 -bottom-16 shadow-lg' : 'opacity-0 -z-10 -bottom-10 shadow-sm'} transition-all duration-200 ease-in-out`}>
             <button
               className="px-2 pointer-events-auto py-0.5 flex items-center gap-2 rounded hover:bg-red-100 text-red-600 transition-all duration-75"
-              disabled={updating || deleting || !showOptions}
+              disabled={disabled || !showOptions}
               onClick={handleDeleteClick}
             >
               <TrashIcon className="h-4 w-4" />
               <span>{deleting ? 'Deleting...' : 'Delete'}</span>
             </button>
           </div>
-        </button>
+        </div>
       </div>
 
       <hr />
@@ -182,7 +196,7 @@ export default function EditablePromocode({ promocode }: { promocode: Promocode 
               className={`text-2xl py-2 ${isAmount ? 'pl-6' : 'pl-2'} pr-2 w-36 rounded-lg bg-transparent outline-none border ${discount !== promocode.discount ? 'border-neutral-200': 'border-transparent'} hover:border-neutral-300 focus:border-neutral-300 focus:bg-neutral-50 max-w-fit`}
               min={0}
               max={isAmount ? 1000: 100}
-              disabled={updating || deleting}
+              disabled={disabled}
             />
             <div className="absolute top-0 left-[70px] h-full flex justify-end items-center text-2xl pointer-events-none">off</div>
             {discountModified && <span className="absolute -top-3 -right-3"><ResetButton handleClick={() => setDiscount(promocode.discount)} /></span>}
@@ -197,7 +211,7 @@ export default function EditablePromocode({ promocode }: { promocode: Promocode 
                 value={maxDiscount}
                 onChange={e => setMaxDiscount(e.target.valueAsNumber)}
                 className={`text-2xl py-2 pl-[82px] pr-2 w-44 rounded-lg bg-transparent outline-none border ${maxDiscount !== promocode.maxDiscount ? 'border-neutral-200': 'border-transparent'} hover:border-neutral-300 focus:border-neutral-300 focus:bg-neutral-50 max-w-fit`}
-                disabled={updating || deleting}
+                disabled={disabled}
               />
               {maxDiscountModified && <span className="absolute -top-3 -right-3"><ResetButton handleClick={() => setMaxDiscount(promocode.maxDiscount ?? Infinity)} /></span>}
             </div>
@@ -214,7 +228,7 @@ export default function EditablePromocode({ promocode }: { promocode: Promocode 
                 value={start}
                 onChange={e => setStart(e.target.value)}
                 className={`text-2xl p-2 w-[182px] rounded-lg bg-transparent outline-none border ${start !== new Date(promocode.start).toISOString().slice(0, 10) ? 'border-neutral-200': 'border-transparent'} hover:border-neutral-300 focus:border-neutral-300 focus:bg-neutral-50 max-w-fit`}
-                disabled={updating || deleting}
+                disabled={disabled}
               />
               {startModified && <span className="absolute -top-3 -right-3"><ResetButton handleClick={() => setStart(formatDateString(promocode.start))} /></span>}
             </div>
@@ -228,7 +242,7 @@ export default function EditablePromocode({ promocode }: { promocode: Promocode 
                 onChange={e => setEnd(e.target.value)}
                 min={start}
                 className={`text-2xl p-2 w-[182px] rounded-lg bg-transparent outline-none border ${end !== new Date(promocode.end).toISOString().slice(0, 10) ? 'border-neutral-200': 'border-transparent'} hover:border-neutral-300 focus:border-neutral-300 focus:bg-neutral-50 max-w-fit`}
-                disabled={updating || deleting}
+                disabled={disabled}
               />
               {endModified && <span className="absolute -top-3 -right-3"><ResetButton handleClick={() => setEnd(formatDateString(promocode.end))} /></span>}
             </div>
@@ -255,14 +269,14 @@ export default function EditablePromocode({ promocode }: { promocode: Promocode 
               <button
                 className="px-3 py-1.5 rounded text-neutral-600 hover:text-neutral-800 bg-neutral-300 hover:bg-neutral-400 border-neutral-400 hover:border-neutral-500 border transition-all duration-100"
                 onClick={handleResetClick}
-                disabled={updating || deleting}
+                disabled={disabled}
               >
                 Reset All
               </button>
               <button
                 className="px-3 py-1.5 rounded text-neutral-200 hover:text-neutral-50 bg-neutral-600 hover:bg-neutral-700 border-neutral-700 hover:border-neutral-800 border transition-all duration-100"
                 onClick={handleSaveClick}
-                disabled={updating || deleting}
+                disabled={disabled}
               >
                 {updating ? 'Saving...' : 'Save Changes'}
               </button>
