@@ -51,26 +51,13 @@ export async function PATCH(req: NextRequest) {
   if (parsedBody.start) updateData.start = new Date(parsedBody.start)
   if (parsedBody.end) updateData.end = new Date(parsedBody.end)
 
-  console.log({updateData})
-
   try {
     const updatedPromocode = await prisma.promocode.update({
       where: { id: parsedBody.id },
       data: { ...updateData }
     });
-
-     console.log(updatedPromocode)
-
-    // const updatedPromocode = { msg: 'hi' }
     return NextResponse.json(updatedPromocode.code);
   } catch (e) {
-    // if (e instanceof ZodError) {
-    //   return new Response(null, {
-    //     status: 400,
-    //     statusText: e.toString(),
-    //   });
-    // }
-
     return new Response(null, {
       status: 500,
       statusText: JSON.stringify(e),

@@ -4,7 +4,6 @@ import Table from "./table";
 
 async function PromocodesPage() {
   const user = await currentUser();
-
   const promocodes = await prisma.promocode.findMany({
     where: { userId: user?.id }
   });
