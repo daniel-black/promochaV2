@@ -40,8 +40,8 @@ export default function Form() {
       type,
       discount: type === 'amount' ? amountDiscount : percentDiscount,
       maxDiscount: maxDiscount === Infinity ? null : maxDiscount,
-      start: new Date(start),
-      end: new Date(end),
+      start: start,
+      end: start,
     };
 
     const parsedFormData = NewPromcodeSchema.parse(formData);

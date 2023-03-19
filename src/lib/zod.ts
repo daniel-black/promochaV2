@@ -22,3 +22,9 @@ export const UpdatePromocodeSchema = z.object({
 });
 
 export type UpdatePromocodeSchemaType = z.infer<typeof UpdatePromocodeSchema>;
+
+export const IdSchema = z.object({
+  id: z.number(),
+});
+
+export type IdSchemaType = z.infer<typeof IdSchema>;

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { NewPromcodeSchema, UpdatePromocodeSchema } from "@/lib/zod";
+import { IdSchema, NewPromcodeSchema, UpdatePromocodeSchema } from "@/lib/zod";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
@@ -57,6 +57,55 @@ export async function PATCH(req: NextRequest) {
       data: { ...updateData }
     });
     return NextResponse.json(updatedPromocode.code);
+  } catch (e) {
+    return new Response(null, {
+      status: 500,
+      statusText: JSON.stringify(e),
+    });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  const body = await req.json();
+  const parsedBody = IdSchema.parse(body);
+
+  const { userId } = getAuth(req);
+
+  if (!userId) {
+    return new Response(null, {
+      status: 401,
+      statusText: 'Unauthorized request',
+    });
+  }
+
+  let userCanDelete = false;
+
+  try {
+    userCanDelete = await prisma.promocode.count({
+      where: {
+        AND: [
+          { userId: userId },
+          { id: parsedBody.id }
+        ]
+      }
+    }) === 1;
+  } catch (e) {
+    return new Response(null, {
+      status: 500,
+      statusText: 'Error checking if user could delete',
+    });
+  }
+
+  if (!userCanDelete) {
+    return new Response(null, {
+      status: 401,
+      statusText: 'User can only delete their own promocodes',
+    });
+  }
+
+  try {
+    const deletedPromocode = await prisma.promocode.delete({ where: { id: parsedBody.id } });
+    return NextResponse.json(deletedPromocode.code);
   } catch (e) {
     return new Response(null, {
       status: 500,
