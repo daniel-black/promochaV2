@@ -28,7 +28,7 @@ function DiscountInput(props: DiscountInputProps) {
       <FormSectionWrapper>
         <Label name="discount" />
         <div className="relative">
-          <span className="absolute h-full w-12 bg-neutral-50 rounded-l-md border text-neutral-400 flex justify-center items-center">{isAmount ? '$' : '%'}</span>
+          <span className="absolute h-full w-12 bg-neutral-50 rounded-l-md border text-neutral-400 flex justify-center items-center pointer-events-none">{isAmount ? '$' : '%'}</span>
           <input
             type="number"
             value={isAmount ? props.amountDiscount : props.percentDiscount}
